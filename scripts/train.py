@@ -198,16 +198,16 @@ augmentation_config = {
     },
 }
 
-model_trainer.train(
-    dataset_dir=dataset_path.as_posix(),
-    epochs=epochs,
-    batch_size=batch_size,
-    lr=learning_rate,
-    grad_accum_steps=grad_accumulation_steps,
-    output_dir=path_experiment.as_posix(),
-    resolution=resolution,
-    aug_config=augmentation_config,
-)
+    model_trainer.train(
+        dataset_dir=dataset_path.as_posix(),
+        epochs=epochs,
+        batch_size=batch_size,
+        lr=learning_rate,
+        grad_accum_steps=grad_accumulation_steps,
+        output_dir=path_experiment.as_posix(),
+        resolution=resolution,
+        aug_config=augmentation_config,
+    )
 
     model_folder_path = logger.path_model()
     # Repackage each final checkpoint as a single compressed model archive in the model folder
