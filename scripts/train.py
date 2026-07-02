@@ -147,6 +147,7 @@ def main(
         "resolution": resolution,
         "dataset": dataset.info.dataset_name,
         "has_cuda": has_cuda,
+        "augmentation": "light_cross_city_v1",
     }
 
     if has_cuda:
@@ -173,15 +174,40 @@ def main(
         user_logger.info("Early stopping before training was activated with '--stop_early' flag.")
         return None
 
-    model_trainer.train(
-        dataset_dir=dataset_path.as_posix(),
-        epochs=epochs,
-        batch_size=batch_size,
-        lr=learning_rate,
-        grad_accum_steps=grad_accumulation_steps,
-        output_dir=path_experiment.as_posix(),
-        resolution=resolution,
-    )
+    # Light data augmentation for cross-city traffic detection.
+# Custom aug_config replaces the default augmentation configuration,
+# so HorizontalFlip is included explicitly.
+augmentation_config = {
+    "HorizontalFlip": {
+        "p": 0.5,
+    },
+    "RandomBrightnessContrast": {
+        "brightness_limit": 0.15,
+        "contrast_limit": 0.15,
+        "p": 0.5,
+    },
+    "HueSaturationValue": {
+        "hue_shift_limit": 8,
+        "sat_shift_limit": 12,
+        "val_shift_limit": 10,
+        "p": 0.3,
+    },
+    "GaussianBlur": {
+        "blur_limit": (3, 5),
+        "p": 0.15,
+    },
+}
+
+model_trainer.train(
+    dataset_dir=dataset_path.as_posix(),
+    epochs=epochs,
+    batch_size=batch_size,
+    lr=learning_rate,
+    grad_accum_steps=grad_accumulation_steps,
+    output_dir=path_experiment.as_posix(),
+    resolution=resolution,
+    aug_config=augmentation_config,
+)
 
     model_folder_path = logger.path_model()
     # Repackage each final checkpoint as a single compressed model archive in the model folder
